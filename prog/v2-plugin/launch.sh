@@ -7,12 +7,15 @@ IPALLOC_RANGE=${IPALLOC_RANGE:-10.32.0.0/12}
 HTTP_ADDR=${WEAVE_HTTP_ADDR:-127.0.0.1:6784}
 STATUS_ADDR=${WEAVE_STATUS_ADDR:-0.0.0.0:6782}
 HOST_ROOT=${HOST_ROOT:-/host}
-LOG_FILE=/tmp/weaver.log
+LOG_FILE=/var/lib/weave/weaver.log
 
 echo "Starting launch.sh" >>$LOG_FILE
 
 # Check if the IP range overlaps anything existing on the host
 /usr/bin/weaveutil netcheck $IPALLOC_RANGE weave
+
+SWARM_PEERS=$(/usr/bin/weaveutil swarm-manager-peers 2>>$LOG_FILE)
+IS_SWARM_MANAGER=$(/usr/bin/weaveutil is-swarm-manager 2>>$LOG_FILE)
 
 /home/weave/weave --local create-bridge --force >>$LOG_FILE 2>&1
 
@@ -32,8 +35,11 @@ if [ "$(/home/weave/weave --local bridge-type)" = "bridge" ]; then
 fi
 
 if [ -z "$IPALLOC_INIT" ]; then
-    # ideally we would know the peer count
-    IPALLOC_INIT="consensus"
+    if [ $IS_SWARM_MANAGER == "1" ]; then
+        IPALLOC_INIT="consensus=$(echo $SWARM_PEERS | wc -l)"
+    else
+        IPALLOC_INIT="observer"
+    fi
 fi
 
 /home/weave/weaver $EXTRA_ARGS --port=6783 $BRIDGE_OPTIONS \
@@ -41,6 +47,7 @@ fi
     --ipalloc-range=$IPALLOC_RANGE $NICKNAME_ARG \
     --ipalloc-init $IPALLOC_INIT \
     "$@" \
+    $(echo $SWARM_PEERS | tr '\n' ' ') \
     >>$LOG_FILE 2>&1 &
 WEAVE_PID=$!
 
@@ -54,7 +61,7 @@ while true; do
     sleep 1
 done
 
-/home/weave/plugin --meshsocket='' --docker-api='' >/tmp/plugin.log 2>&1 &
+/home/weave/plugin --meshsocket='' --docker-api='' >/var/lib/weave/plugin.log 2>&1 &
 
 echo "End of launch.sh" >>$LOG_FILE
 
