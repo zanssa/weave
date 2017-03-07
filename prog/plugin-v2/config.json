@@ -50,6 +50,22 @@
           "value"
       ],
       "value": ""
+    },
+    {
+      "description": "Encryption password",
+      "name": "WEAVE_PASSWORD",
+      "settable": [
+          "value"
+      ],
+      "value": ""
+    },
+    {
+      "description": "MTU",
+      "name": "WEAVE_MTU",
+      "settable": [
+          "value"
+      ],
+      "value": ""
     }
   ],
   "network": {
