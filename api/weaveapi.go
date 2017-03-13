@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 const (
@@ -74,6 +75,22 @@ func NewClient(addr string, log Logger) *Client {
 func (client *Client) Connect(remote string) error {
 	_, err := client.httpVerb("POST", "/connect", url.Values{"peer": {remote}})
 	return err
+}
+
+// IsReady returns true if the API server is up and running
+func (client *Client) IsReady() bool {
+	_, err := client.httpVerb("GET", "/status", nil)
+
+	return err == nil
+}
+
+// WaitAPIServer waits until the API server is ready to serve.
+//
+// Might block infinitely.
+func (client *Client) WaitAPIServer() {
+	for !client.IsReady() {
+		time.Sleep(1 * time.Second)
+	}
 }
 
 type Logger interface {

@@ -25,6 +25,7 @@ import (
 	"github.com/weaveworks/weave/nameserver"
 	weavenet "github.com/weaveworks/weave/net"
 	"github.com/weaveworks/weave/net/address"
+	"github.com/weaveworks/weave/plugin"
 	weave "github.com/weaveworks/weave/router"
 )
 
@@ -143,6 +144,10 @@ func main() {
 		trustedSubnetStr   string
 		dbPrefix           string
 		isAWSVPC           bool
+		pluginSocket       string
+		pluginMeshSocket   string
+		noMulticastRoute   bool
+		enablePlugin       bool
 
 		defaultDockerHost = "unix:///var/run/docker.sock"
 	)
@@ -184,6 +189,11 @@ func main() {
 	mflag.StringVar(&trustedSubnetStr, []string{"-trusted-subnets"}, "", "comma-separated list of trusted subnets in CIDR notation")
 	mflag.StringVar(&dbPrefix, []string{"-db-prefix"}, "/weavedb/weave", "pathname/prefix of filename to store data")
 	mflag.BoolVar(&isAWSVPC, []string{"-awsvpc"}, false, "use AWS VPC for routing")
+
+	mflag.BoolVar(&enablePlugin, []string{"-plugin"}, false, "enable Docker plugin")
+	mflag.StringVar(&pluginSocket, []string{"-plugin-socket"}, "/run/docker/plugins/weave.sock", "plugin socket on which to listen")
+	mflag.StringVar(&pluginMeshSocket, []string{"-plugin-mesh-socket"}, "/run/docker/plugins/weavemesh.sock", "plugin socket on which to listen in mesh mode")
+	mflag.BoolVar(&noMulticastRoute, []string{"-no-multicast-route"}, false, "deprecated (this is now the default)")
 
 	// crude way of detecting that we probably have been started in a
 	// container, with `weave launch` --> suppress misleading paths in
@@ -366,6 +376,11 @@ func main() {
 		statusMux.Handle("/", muxRouter)
 		Log.Println("Listening for metrics requests on", statusAddr)
 		go listenAndServeHTTP(statusAddr, statusMux)
+	}
+
+	if enablePlugin {
+		// TODO(mp) do not pass pluginMeshSocket if plugin-v2 is in use
+		go plugin.Start(httpAddr, dockerAPI, pluginSocket, pluginMeshSocket, noMulticastRoute)
 	}
 
 	signals.SignalHandlerLoop(common.Log, router)
