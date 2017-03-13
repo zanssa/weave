@@ -58,16 +58,3 @@ exec /home/weave/weaver $EXTRA_ARGS --port=6783 $BRIDGE_OPTIONS \
     --plugin \
     "$@" \
     $(echo $SWARM_MANAGER_PEERS | tr '\n' ' ')
-
-# TODO(mp) add waiting to plugin?
-## Wait for weave process to become responsive
-#while true; do
-#    curl $HTTP_ADDR/status >/dev/null 2>&1 && break
-#    if ! kill -0 $WEAVER_PID >/dev/null 2>&1; then
-#        echo Weave process has died >&2
-#        exit 1
-#    fi
-#    sleep 1
-#done
-
-#wait $WEAVER_PID
