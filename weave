@@ -164,7 +164,6 @@ exec_remote() {
         -e WEAVE_MTU \
         -e WEAVE_NO_FASTDP \
         -e WEAVE_NO_BRIDGED_FASTDP \
-        -e WEAVE_NO_PLUGIN \
         -e DOCKER_BRIDGE \
         -e DOCKER_CLIENT_HOST="$DOCKER_CLIENT_HOST" \
         -e DOCKER_CLIENT_ARGS \
