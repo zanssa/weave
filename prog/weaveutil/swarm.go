@@ -16,10 +16,8 @@ func isSwarmManager(args []string) error {
 		return err
 	}
 
-	if info.Swarm.ControlAvailable {
-		fmt.Println("1")
-	} else {
-		fmt.Println("0")
+	if !info.Swarm.ControlAvailable {
+		return fmt.Errorf("node is not a manager")
 	}
 
 	return nil

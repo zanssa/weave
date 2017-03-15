@@ -17,7 +17,7 @@ echo "Starting launch.sh"
 /usr/bin/weaveutil netcheck $IPALLOC_RANGE weave
 
 SWARM_MANAGER_PEERS=$(/usr/bin/weaveutil swarm-manager-peers)
-IS_SWARM_MANAGER=$(/usr/bin/weaveutil is-swarm-manager)
+! /usr/bin/weaveutil is-swarm-manager 2>/dev/null || IS_SWARM_MANAGER=1
 # Prevent from restoring from a persisted peers list
 rm -f "/restart.sentinel"
 
