@@ -26,9 +26,6 @@ rm -f "/restart.sentinel"
     --weavedb-dir-path=$WEAVE_DIR \
     --force
 
-# ?
-NICKNAME_ARG=""
-
 BRIDGE_OPTIONS="--datapath=datapath"
 if [ "$(/home/weave/weave --local bridge-type)" = "bridge" ]; then
     # TODO: Call into weave script to do this
@@ -51,8 +48,9 @@ fi
 
 exec /home/weave/weaver $EXTRA_ARGS --port=6783 $BRIDGE_OPTIONS \
     --http-addr=$HTTP_ADDR --status-addr=$STATUS_ADDR --docker-api='' --no-dns \
-    --ipalloc-range=$IPALLOC_RANGE $NICKNAME_ARG \
+    --ipalloc-range=$IPALLOC_RANGE \
     --ipalloc-init $IPALLOC_INIT \
+    --nickname "$(hostname)" \
     --log-level=debug \
     --db-prefix="$WEAVE_DIR/weave" \
     --plugin \
