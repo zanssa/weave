@@ -20,30 +20,12 @@ import (
 
 var Log = common.Log
 
-func Start(weaveAPIAddr string, dockerAPIAddr string, address string, meshAddress string) {
+func Start(weaveAPIAddr string, dockerClient *docker.Client, address string, meshAddress string) {
 	weave := weaveapi.NewClient(weaveAPIAddr, Log)
-
-	var dockerClient *docker.Client
-	var err error
-	if dockerAPIAddr != "" {
-		// API 1.21 is the first version that supports docker network commands
-		dockerClient, err = docker.NewVersionedClient(dockerAPIAddr, "1.21")
-		if err != nil {
-			Log.Fatalf("unable to connect to docker: %s", err)
-		}
-	}
-
-	if dockerClient == nil {
-		Log.Info("Running without Docker API connection")
-	} else {
-		Log.Info(dockerClient.Info())
-	}
-
 	weave.WaitAPIServer()
 	Log.Info("Plugin finished waiting for Weave API to be ready")
 
-	err = run(dockerClient, weave, address, meshAddress)
-	if err != nil {
+	if err := run(dockerClient, weave, address, meshAddress); err != nil {
 		Log.Fatal(err)
 	}
 }
