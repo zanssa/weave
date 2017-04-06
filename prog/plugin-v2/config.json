@@ -19,9 +19,9 @@
   "mounts": [
     {
       "destination": "/host/proc/",
-      "type": "proc",
+      "type": "bind",
       "source": "/proc/",
-      "options": ["rw"]
+      "options": ["rbind", "rw"]
     },
     {
       "destination": "/var/run/docker.sock",
