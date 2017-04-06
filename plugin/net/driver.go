@@ -191,9 +191,6 @@ func (driver *driver) findNetworkInfo(id string) (network, error) {
 	if found {
 		return network, nil
 	}
-	if driver.docker == nil { // No way to look it up - TODO persist the info
-		return network, nil
-	}
 	info, err := driver.docker.NetworkInfo(id)
 	if err != nil {
 		return network, err
