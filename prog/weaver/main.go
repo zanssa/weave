@@ -147,6 +147,7 @@ func main() {
 		pluginSocket       string
 		pluginMeshSocket   string
 		enablePlugin       bool
+		enablePluginV2     bool
 
 		defaultDockerHost = "unix:///var/run/docker.sock"
 	)
@@ -189,7 +190,8 @@ func main() {
 	mflag.StringVar(&dbPrefix, []string{"-db-prefix"}, "/weavedb/weave", "pathname/prefix of filename to store data")
 	mflag.BoolVar(&isAWSVPC, []string{"-awsvpc"}, false, "use AWS VPC for routing")
 
-	mflag.BoolVar(&enablePlugin, []string{"-plugin"}, false, "enable Docker plugin")
+	mflag.BoolVar(&enablePlugin, []string{"-plugin"}, false, "enable Docker plugin (v1)")
+	mflag.BoolVar(&enablePluginV2, []string{"-plugin-v2"}, false, "enable Docker plugin (v2)")
 	mflag.StringVar(&pluginSocket, []string{"-plugin-socket"}, "/run/docker/plugins/weave.sock", "plugin socket on which to listen")
 	mflag.StringVar(&pluginMeshSocket, []string{"-plugin-mesh-socket"}, "/run/docker/plugins/weavemesh.sock", "plugin socket on which to listen in mesh mode")
 
@@ -376,8 +378,8 @@ func main() {
 		go listenAndServeHTTP(statusAddr, statusMux)
 	}
 
-	if enablePlugin {
-		go plugin.Start(httpAddr, dockerCli, pluginSocket, pluginMeshSocket)
+	if enablePlugin || enablePluginV2 {
+		go plugin.Start(httpAddr, dockerCli, pluginSocket, pluginMeshSocket, noDNS, enablePluginV2)
 	}
 
 	signals.SignalHandlerLoop(common.Log, router)
