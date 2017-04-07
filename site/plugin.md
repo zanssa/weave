@@ -67,7 +67,7 @@ plugins such as Weave Net.
 
 To create a new network for services in swarm mode, run:
 
-    $ docker network create --driver=weave mynetwork
+    $ docker network create --driver=weaveworks/net-plugin:2.0.0 mynetwork
 
 then use it to create a service:
 
