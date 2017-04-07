@@ -898,9 +898,10 @@ is_plugin_v2_enabled() {
     util_op is-docker-plugin-enabled $PLUGIN_NAME 2>/dev/null
 }
 
+# Check that plugin (v2) is not running.
 check_not_running_plugin_v2() {
     if is_plugin_v2_enabled; then
-        echo "Docker plugin \"$PLUGIN_NAME\" is running." >&2
+        echo "Docker plugin \"$PLUGIN_NAME\" is running; Aborting." >&2
         return 1
     fi
 }
