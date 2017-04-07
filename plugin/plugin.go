@@ -22,8 +22,9 @@ var Log = common.Log
 
 func Start(weaveAPIAddr string, dockerClient *docker.Client, address string, meshAddress string, noDNS bool, isPluginV2 bool) {
 	weave := weaveapi.NewClient(weaveAPIAddr, Log)
-	weave.WaitAPIServer()
-	Log.Info("Plugin finished waiting for Weave API to be ready")
+	Log.Info("Waiting for Weave API Server...")
+	weave.WaitAPIServer(30)
+	Log.Info("Finished waiting for Weave API Server")
 
 	if err := run(dockerClient, weave, address, meshAddress, noDNS, isPluginV2); err != nil {
 		Log.Fatal(err)

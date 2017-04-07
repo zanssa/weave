@@ -85,11 +85,9 @@ func (client *Client) IsReady() bool {
 }
 
 // WaitAPIServer waits until the API server is ready to serve.
-//
-// Might block infinitely.
-func (client *Client) WaitAPIServer() {
-	for !client.IsReady() {
-		time.Sleep(1 * time.Second)
+func (client *Client) WaitAPIServer(n int) {
+	for i := 0; i < n && !client.IsReady(); i++ {
+		time.Sleep(2 * time.Second)
 	}
 }
 
