@@ -2,7 +2,7 @@
 
 . "$(dirname "$0")/config.sh"
 
-PLUGIN_NAME="weave-ci-registry:5000/weaveworks/plugin-v2"
+PLUGIN_NAME="weave-ci-registry:5000/weaveworks/net-plugin"
 HOST1_IP=$($SSH $HOST1 getent ahosts $HOST1 | grep "RAW" | cut -d' ' -f1)
 SERVICE="weave-850-service"
 NETWORK="weave-850-network"
@@ -117,11 +117,10 @@ wait_for_service $HOST1 $SERVICE 2
 C1=$($SSH $HOST1 weave ps | grep -v weave:expose | awk '{print $1}')
 C2_IP=$($SSH $HOST2 weave ps | grep -v weave:expose | awk '{print $3}' | cut -d/ -f1)
 
-# TODO test for encryption
-
 assert_raises "exec_on $HOST1 $C1 $PING $C2_IP"
 
-assert_raises "weave_on $HOST1 status | grep -q 'Service: plugin (v2)'"
+# We do not test "weave {status,launch}", because the weave script does not detect
+# plugin-v2 if its name is prefixed with a registry name.
 
 # Failing to cleanup will make the rest of the tests to fail
 cleanup $HOST1 $HOST2
